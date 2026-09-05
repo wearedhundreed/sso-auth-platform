@@ -1,0 +1,17 @@
+name: "SSO Security Analysis"
+
+queries:
+  - uses: security-extended
+
+paths:
+  - app
+  - components
+  - lib
+  - tests
+
+paths-ignore:
+  - node_modules
+  - .next
+  - dist
+  - build
+  - coverage

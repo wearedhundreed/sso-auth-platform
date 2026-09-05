@@ -1,0 +1,117 @@
+// Prisma Schema for Secure Multi-Application SSO Platform
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model: Stores authenticated identity claims received from verified OIDC ID Tokens.
+// Strictly NEVER stores identity-provider passwords or private keys.
+model User {
+  id            String    @id @default(cuid())
+  oidcSub       String    @unique @map("oidc_sub") // Unique Subject identifier from Identity Provider
+  email         String    @unique
+  name          String?
+  emailVerified Boolean   @default(false) @map("email_verified")
+  roles         String[]  @default(["user"])
+  sessions      Session[]
+  auditEvents   AuthenticationEvent[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([oidcSub])
+  @@map("users")
+}
+
+// Application model: Registry of authorized client applications permitted to initiate SSO.
+// Strictly enforces exact callback URL and logout URL allowlists.
+model Application {
+  id                 String    @id @default(cuid())
+  name               String
+  clientId           String    @unique @map("client_id")
+  redirectUris       String[]  @map("redirect_uris")
+  logoutRedirectUris String[]  @map("logout_redirect_uris")
+  allowedOrigins     String[]  @map("allowed_origins")
+  enabled            Boolean   @default(true)
+  auditEvents        AuthenticationEvent[]
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@index([clientId])
+  @@map("applications")
+}
+
+// Session model: Tracks active, server-side authenticated sessions.
+// Never stores access tokens, ID tokens, or identity-provider passwords.
+model Session {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String    @unique @map("session_token")
+  userAgent    String?   @map("user_agent")
+  ipAddress    String?   @map("ip_address")
+  expiresAt    DateTime  @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+// AuthenticationEvent model: Immutable security audit trail for authentication,
+// state validation, token validation, and logout events.
+enum AuditEventType {
+  LOGIN_STARTED
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  LOGOUT
+  CALLBACK_REJECTED
+  INVALID_STATE
+  INVALID_NONCE
+  TOKEN_VALIDATION_FAILURE
+  WEBHOOK_ACCEPTED
+  WEBHOOK_REJECTED
+}
+
+model AuthenticationEvent {
+  id            String          @id @default(cuid())
+  type          AuditEventType
+  userId        String?         @map("user_id")
+  user          User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  clientId      String?         @map("client_id")
+  application   Application?    @relation(fields: [clientId], references: [clientId], onDelete: SetNull)
+  ipAddress     String?         @map("ip_address")
+  userAgent     String?         @map("user_agent")
+  details       Json?           // Strictly sanitized; no secrets, tokens, or passwords
+  timestamp     DateTime        @default(now())
+
+  @@index([type])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("authentication_events")
+}
+
+// WebhookEvent model: Tracks GitHub webhook deliveries to ensure idempotency (deduplication)
+// and audit CI/CD, pull request, and CodeQL security alerts.
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  deliveryId  String   @unique @map("delivery_id")
+  event       String
+  sender      String?
+  repository  String?
+  action      String?
+  summary     String
+  status      String   @default("PROCESSED")
+  receivedAt  DateTime @default(now()) @map("received_at")
+
+  @@index([deliveryId])
+  @@index([event])
+  @@map("webhook_events")
+}

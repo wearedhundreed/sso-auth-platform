@@ -1,0 +1,8 @@
+{
+  "name": "Remix Secure Multi-Application SSO Platform",
+  "description": "Production-ready OpenID Connect and OAuth 2.0 PKCE authentication platform with Firebase Firestore persistence, Google Drive Workspace integration, GitHub webhook integration, and security auditing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

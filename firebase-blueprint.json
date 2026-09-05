@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile in the SSO and identity directory.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Unique user identity identifier" },
+        "email": { "type": "string", "format": "email", "description": "Corporate or primary email" },
+        "name": { "type": "string", "description": "Full name of the identity owner" },
+        "roles": { "type": "string", "description": "Role identifiers" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["userId", "email"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Sanitized security audit trail record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Audit event ID" },
+        "type": { "type": "string", "description": "Event type" },
+        "timestamp": { "type": "string", "description": "ISO timestamp" },
+        "ipAddress": { "type": "string", "description": "Client IP" },
+        "details": { "type": "string", "description": "Event metadata" }
+      },
+      "required": ["id", "type", "timestamp"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "Registered enterprise client application.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Application record ID" },
+        "clientId": { "type": "string", "description": "OAuth 2.0 client_id" },
+        "name": { "type": "string", "description": "Application display name" },
+        "enabled": { "type": "string", "description": "Status flag" }
+      },
+      "required": ["id", "clientId", "name"]
+    },
+    "DriveBookmark": {
+      "title": "DriveBookmark",
+      "description": "Bookmarked or synced Google Drive file metadata saved to Firestore.",
+      "type": "object",
+      "properties": {
+        "fileId": { "type": "string", "description": "Google Drive File ID" },
+        "name": { "type": "string", "description": "Name of the file" },
+        "mimeType": { "type": "string", "description": "MIME type" },
+        "webViewLink": { "type": "string", "description": "Google Drive Web View Link" },
+        "userId": { "type": "string", "description": "UID of the user who saved the bookmark" },
+        "savedAt": { "type": "string", "description": "ISO timestamp when bookmarked" }
+      },
+      "required": ["fileId", "name", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and session identity records"
+    },
+    "/users/{userId}/driveBookmarks/{fileId}": {
+      "schema": "DriveBookmark",
+      "description": "User saved Google Drive bookmarks and records"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Security audit logs for SSO events"
+    },
+    "/applications/{appId}": {
+      "schema": "Application",
+      "description": "Allowlisted client applications"
+    }
+  }
+}
