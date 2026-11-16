@@ -1,6 +1,18 @@
-# Secure Multi-Application SSO Platform
+# MOREDESA Universal Authentication
 
-A production-ready, standards-compliant Single Sign-On (SSO) authentication platform built with OpenID Connect (OIDC) and OAuth 2.0 Authorization Code Flow with Proof Key for Code Exchange (PKCE, RFC 7636).
+> **Release status: development / integration preparation — not production-ready.** The current runtime still contains demonstration authentication paths, process-local state/session storage, and security controls that require remediation. See [Security Remediation](docs/SECURITY_REMEDIATION.md) before deploying.
+
+This project is being extended as a responsive web application and installable PWA, with Microsoft Entra External ID as the intended customer identity provider. Wix is intended for public content and navigation; it must link to this separately hosted authentication application.
+
+## Current implementation branch
+
+- PWA metadata and service-worker registration: [manifest](public/manifest.webmanifest), [service worker](public/sw.js)
+- Wix integration boundary: [Wix Integration](docs/WIX_INTEGRATION.md)
+- External ID setup: [External ID Deployment](docs/EXTERNAL_ID_DEPLOYMENT.md)
+- Production blockers: [Security Remediation](docs/SECURITY_REMEDIATION.md)
+
+
+A development-stage Single Sign-On (SSO) authentication platform built with OpenID Connect (OIDC) and OAuth 2.0 Authorization Code Flow with Proof Key for Code Exchange (PKCE, RFC 7636).
 
 Provides centralized federated identity for multiple enterprise applications with automated GitHub CI/CD, CodeQL security analysis, GitHub webhook verification with HMAC-SHA256, PostgreSQL/Prisma persistence, and tamper-evident security auditing.
 
