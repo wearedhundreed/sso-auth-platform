@@ -38,7 +38,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (/\\.(?:js|css|woff2?|png|svg|ico)$/.test(url.pathname)) {
+  const staticExtensions = [".js", ".css", ".woff", ".woff2", ".png", ".svg", ".ico"];
+  if (staticExtensions.some((extension) => url.pathname.endsWith(extension))) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
         if (response.ok && response.type === "basic") {
