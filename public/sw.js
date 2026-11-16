@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (/.(?:js|css|woff2?|png|svg|ico)$/.test(url.pathname)) {
+  if (/\\.(?:js|css|woff2?|png|svg|ico)$/.test(url.pathname)) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
         if (response.ok && response.type === "basic") {
