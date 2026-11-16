@@ -2,7 +2,7 @@
  * Authentication, API, callback, token and session responses are never cached.
  * Only same-origin static assets may be cached.
  */
-const CACHE_NAME = "mored esa-static-v1".replace(" ", "");
+const CACHE_NAME = "moredesa-static-v1";
 const STATIC_ASSETS = ["/", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
